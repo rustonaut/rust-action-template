@@ -1,8 +1,13 @@
 name: Cargo Audit
 
 on:
+  # Only merges to master matter.
   pull_request:
     type: [opened, synchronize]
+    paths:
+      - '**/Cargo.toml'
+      - '**/Cargo.lock'
+
   schedule:
     - cron: '33 3 * * *'
   workflow_dispatch:
@@ -12,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: actions-rs/audit-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: rustonaut/cargo-audit-preloaded@v0
+      # - uses: actions-rs/audit-check@v1
+      #   with:
+      #     token: ${{ secrets.GITHUB_TOKEN }}
