@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Automatically Assign Issues"
-        uses: pozil/auto-assign-issue@v1
+        uses: rustonaut/auto-assign-issue@forked
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           assignees: rustonaut
