@@ -1,0 +1,15 @@
+name: On new Issue
+
+on:
+  issues:
+    type: [opened]
+
+jobs:
+  assign-me:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Automatically Assign Issues"
+        uses: pozil/auto-assign-issue@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          assignees: rustonaut
