@@ -17,7 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: rustonaut/cargo-audit-preloaded/action@v0
-      # - uses: actions-rs/audit-check@v1
-      #   with:
-      #     token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions-rs/audit-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
