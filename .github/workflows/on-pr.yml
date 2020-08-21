@@ -25,9 +25,11 @@ jobs:
         with:
             script: |
                 const pr = context.payload.pull_request;
-                console.log(pr)
-                const issue = await github.issues.get(pr);
-                console.log(issue);
+                const issue_resp = await github.issues.get(pr);
+                const issue = issue_resp.data;
+                if (issue.title.startsWith("WIP")) {
+                    throw Error("Can not merge WIP pull requests.")
+                }
 
         #FAIL if starts with WIP:
     #   - uses: actions/checkout@v1
