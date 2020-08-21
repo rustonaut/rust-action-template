@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 #FIXME un-bashify, maybe Type Script Action?
 # I went with bash because it's mostly calling gpg/git and
