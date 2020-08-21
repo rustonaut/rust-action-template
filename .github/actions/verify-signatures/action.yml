@@ -12,7 +12,7 @@ inputs:
         description: 'Require all commits to be signed.'
         required: false
         default: false
-    require_signed_tags:
+    require_commit_signing_fpr:
         description: 'Required commits to be signed with a key associated with this primary key FPR'
         required: false
 runs:
