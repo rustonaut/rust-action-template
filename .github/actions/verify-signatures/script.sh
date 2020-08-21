@@ -122,11 +122,12 @@ function gpg_verify() {
     local ENTITY="$2"
     local REQUIRED_FPR="$3"
 
+    local EXIT_CODE=0
 
     filterGoodSignEntriesFromStdin | (
         EXIT_CODE=1
         while read KEY; do
-            debug "Good signature for key: $KEY"
+            debug "Good signature with key: $KEY"
             FPR=$(lookupFPR $KEY)
             if [ ! "$REQUIRED_FPR" = "" ] && [ ! "$FPR" = "$REQUIRED_FPR" ] ; then
                 warn "Signed $TYPE $ENTITY with wrong key. Expected $REQUIRED_FPR, found $FPR"
@@ -135,8 +136,7 @@ function gpg_verify() {
             fi
         done
         return $EXIT_CODE
-    )
-    local EXIT_CODE=$?
+    ) || EXIT_CODE=$?
 
     if [ ! "$EXIT_CODE" = 0 ] ; then
         debug "Debug failed to find good signature"
