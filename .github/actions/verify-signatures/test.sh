@@ -278,3 +278,21 @@ assert_eq "$OUT" "::debug::Checking Commit cf968a8d04e7111cbebbe256dcfd9b77afd81
 restore_function verify_entity
 
 
+test verify_outputs_errors
+REQUIRE_SIGNED_COMMITS="false"
+REQUIRE_SIGNED_TAGS="false"
+REQUIRE_TAG_SIGNING_FPR=""
+REQUIRE_COMMIT_SIGNING_FPR=""
+GPG_STATUS_MOCK="[GNUPG:] NEWSIG
+[GNUPG:] ERRSIG 4AEE18F83AFDEB23 1 8 00 1598024984 9
+[GNUPG:] NO_PUBKEY 4AEE18F83AFDEB23
+"
+EC=0
+OUT=$(verify from_ref to_ref) || EC=$?
+assert_eq $EC 1
+assert_eq "$OUT" "::debug::Checking Commit cf968a8d04e7111cbebbe256dcfd9b77afd8133b
+::error::Failed to find good signature for commit cf968a8d04e7111cbebbe256dcfd9b77afd8133b
+::debug::Checking Commit aa968a8d04e7111cbebbe256dcfd9b77afd8133b
+::error::Failed to find good signature for commit aa968a8d04e7111cbebbe256dcfd9b77afd8133b
+::debug::Checking Tag v000
+::error::Failed to find good signature for tag v000"
