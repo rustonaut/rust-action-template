@@ -30,6 +30,16 @@ function error() {
     return $FAILURE_EXIT_CODE
 }
 
+# = startGroup(name)
+function startGroup() {
+    echo "::group::$(escapeMessage "$1")"
+}
+
+# = endGroup()
+function endGroup() {
+    echo "::endgroup::"
+}
+
 # escape messages for debug/warn/error
 function escapeMessage() {
     local TMP=${1//%/%25}
@@ -69,8 +79,10 @@ function verify_entity() {
         error "(internal) Only support verify tag/commit but not $ENTITY" || return $?
     fi
 
+    debug "Calling git verify-*"
     PIPE_IT="$(gpg_output_for_git_verify_entity $ENTITY 2>&1 1>/dev/null)"
 
+    debug "Consider no signature case."
     if [ "${#PIPE_IT}" = "0" ] ; then
         if [  "$SIGNING_REQUIRED" = "true" ] ; then
             error "The $TYPE $ENTITY needs to be signed" || return $?
@@ -79,6 +91,8 @@ function verify_entity() {
             return 0
         fi
     fi
+
+    debug "Checking signature."
 
     gpg_verify "$TYPE" "$ENTITY" "$REQUIRED_FPR" <<<"$PIPE_IT"
 
@@ -112,6 +126,7 @@ function gpg_verify() {
     filterGoodSignEntriesFromStdin | (
         EXIT_CODE=1
         while read KEY; do
+            debug "Good signature for key: $KEY"
             FPR=$(lookupFPR $KEY)
             if [ ! "$REQUIRED_FPR" = "" ] && [ ! "$FPR" = "$REQUIRED_FPR" ] ; then
                 warn "Signed $TYPE $ENTITY with wrong key. Expected $REQUIRED_FPR, found $FPR"
@@ -124,6 +139,7 @@ function gpg_verify() {
     local EXIT_CODE=$?
 
     if [ ! "$EXIT_CODE" = 0 ] ; then
+        debug "Debug failed to find good signature"
         error "Failed to find good signature for $TYPE $ENTITY" || return $?
     fi
 
@@ -147,13 +163,18 @@ function verify() {
     local TO="$2"
     $GIT rev-list "$FROM..$TO" -- |
     while read commit; do
+        startGroup $commit
         debug "Checking Commit $commit"
         verify_entity commit $commit
+        debug "Getting tags for $commit"
         $GIT tag --points-at $commit |
         while read tag; do
+            startGroup "$tag"
             debug "Checking Tag $tag"
             verify_entity tag $tag
+            endGroup
         done
+        endGroup
     done
 }
 
