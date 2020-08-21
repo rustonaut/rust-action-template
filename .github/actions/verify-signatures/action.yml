@@ -1,0 +1,22 @@
+name: 'Check Git Signatures'
+description: 'Checks if git signatures are as required.'
+inputs:
+    require_signed_tags:
+        description: 'Require all tags to be signed.'
+        required: false
+        default: true
+    require_tag_signing_fpr:
+        description: 'Required tags to be signed with a key associated with this primary key FPR'
+        required: false
+    require_signed_commits:
+        description: 'Require all commits to be signed.'
+        required: false
+        default: false
+    require_signed_tags:
+        description: 'Required commits to be signed with a key associated with this primary key FPR'
+        required: false
+runs:
+    using: "composite"
+    steps:
+        - run: ${{ github.action_path }}/script.sh
+          shell: bash
