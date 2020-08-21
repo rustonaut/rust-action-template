@@ -63,9 +63,8 @@ test warn
 assert_eq "$(warn "$MESSAGE2")" "::warning::a%25b"
 
 test error
-OUT="$(error "$MESSAGE2")" || EC=$?
+OUT="$(error "$MESSAGE2")"
 assert_eq "$OUT" "::error::a%25b"
-assert_eq $EC $FAILURE_EXIT_CODE
 
 ## Test: lookupFPR
 test lookupFPR

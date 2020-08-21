@@ -27,7 +27,6 @@ function warn() {
 # = core.error(message), but can cause exit with error exit code
 function error() {
     echo "::error::$(escapeMessage "$1")"
-    return $FAILURE_EXIT_CODE
 }
 
 # = startGroup(name)
@@ -76,7 +75,8 @@ function verify_entity() {
         local SIGNING_REQUIRED="$REQUIRE_SIGNED_COMMITS"
         local REQUIRED_FPR="$REQUIRE_COMMIT_SIGNING_FPR"
     else
-        error "(internal) Only support verify tag/commit but not $ENTITY" || return $?
+        error "(internal) Only support verify tag/commit but not $ENTITY"
+        return $FAILURE_EXIT_CODE
     fi
 
     debug "Calling git verify-*"
@@ -85,7 +85,9 @@ function verify_entity() {
     debug "Consider no signature case."
     if [ "${#PIPE_IT}" = "0" ] ; then
         if [  "$SIGNING_REQUIRED" = "true" ] ; then
-            error "The $TYPE $ENTITY needs to be signed" || return $?
+            error "The $TYPE $ENTITY needs to be signed"
+            warn "$(git show "$ENTITY" 2>&1)"
+            return $FAILURE_EXIT_CODE
         else
             debug "Skipping non signed $TYPE"
             return 0
@@ -137,6 +139,7 @@ function gpg_verify() {
             FPR=$(lookupFPR $KEY)
             if [ ! "$REQUIRED_FPR" = "" ] && [ ! "$FPR" = "$REQUIRED_FPR" ] ; then
                 warn "Signed $TYPE $ENTITY with wrong key. Expected $REQUIRED_FPR, found $FPR"
+                warn "$(git show $ENTITY 2>&1)"
             else
                 EXIT_CODE=0
             fi
@@ -146,7 +149,10 @@ function gpg_verify() {
 
     if [ ! "$EXIT_CODE" = 0 ] ; then
         debug "Debug failed to find good signature"
-        error "Failed to find good signature for $TYPE $ENTITY" || return $?
+        error "Failed to find good signature for $TYPE $ENTITY"
+        warn "$(git show "$ENTITY" 2>&1)"
+        return $FAILURE_EXIT_CODE
+
     fi
 
     return $EXIT_CODE
@@ -214,10 +220,12 @@ function parse_input() {
 
     if [ "$REQUIRE_SIGNED_COMMITS" = false ] && [ ! "$REQUIRE_COMMIT_SIGNING_FPR" = "" ] ; then
         error "Cannot require commit signing FPR but not require signing commits!"
+        return $FAILURE_EXIT_CODE
     fi
 
     if [ "$REQUIRE_SIGNED_TAGS" = false ] && [ ! "$REQUIRE_TAG_SIGNING_FPR" = "" ] ; then
         error "Cannot require tag signing FPR but not require signing tags!"
+        return $FAILURE_EXIT_CODE
     fi
 
     debug "Verify Settings:"
