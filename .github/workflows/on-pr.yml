@@ -1,0 +1,43 @@
+name: On Pull-Request
+
+on:
+  pull_request:
+    type: [opened, synchronize]
+
+jobs:
+  validate-signatures:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: ./.github/actions/verify-signatures
+        with:
+            require_signed_commits: false
+            require_signed_tags: true
+            require_tag_signing_fpr: ${{ secrets.TagSigningFpr }}
+
+#   validate-rust-merge-ready:
+#     runs-on: ubuntu-latest
+#     # TODO Use latest stable or night
+#     # TODO Only if title doesn't start wit WIP:
+#     steps:
+#       - uses: actions/checkout@v1
+#       - name: Check cargo fmt
+#         run: cargo fmt -- --check # TODO verbose?
+#       - name: Check clippy
+#         run: cargo clippy
+#       #- name: Do cargo audit # TODO move into github action, cache adversery databasels
+#       #  run: cargo audit
+
+#   validate-rust:
+#     # TODO use matrix, also use matrix for features??
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v1
+#       - name: Check build
+#         run: cargo build --verbose
+#         # If not WIP: prefix then cargo build --verbose ??option to inject deny(warning)??
+#       - name: Run tests
+#         run: cargo test --verbose
+#         # cargo test --no-default-features --verbose
+#         # cargo test --all-features --verbose
+

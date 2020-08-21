@@ -8,6 +8,7 @@ jobs:
   assign-me:
     runs-on: ubuntu-latest
     steps:
+        #TODO consider replacing with actions/github-scripts
       - name: "Automatically Assign Issues"
         uses: rustonaut/auto-assign-issue@forked
         with:
