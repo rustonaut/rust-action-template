@@ -16,8 +16,8 @@ inputs:
         description: 'Required commits to be signed with a key associated with this primary key FPR'
         required: false
     gpg_import_keys_dir:
-        description: 'Dir with a number of exported public keys gpg will import for sig verification.'
-        required: false
+        description: 'Dir with a number of exported public keys gpg will import for sig verification. E.g. use: ${{github.workspace}}/.gpg/import-keys'
+        required: true
         default: .gpg/import-keys
 runs:
     using: "composite"

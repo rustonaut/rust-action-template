@@ -183,7 +183,7 @@ function parse_input() {
     REQUIRE_COMMIT_SIGNING_FPR="${INPUT_REQUIRE_COMMIT_SIGNING_FPR:-}"
     REQUIRE_SIGNED_TAGS="${INPUT_REQUIRE_SIGNED_TAGS:-true}"
     REQUIRE_TAG_SIGNING_FPR="${INPUT_REQUIRE_TAG_SIGNING_FPR:-}"
-    GPG_IMPORT_KEYS_DIR="${INPUT_GPG_IMPORT_KEYS_DIR:-.gpg/import-keys}"
+    GPG_IMPORT_KEYS_DIR="${INPUT_GPG_IMPORT_KEYS_DIR:?dir must be set from outside}"
 
     if [ "$REQUIRE_SIGNED_COMMITS" = false ] && [ ! "$REQUIRE_COMMIT_SIGNING_FPR" = "" ] ; then
         error "Cannot require commit signing FPR but not require signing commits!"
