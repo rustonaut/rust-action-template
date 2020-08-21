@@ -179,10 +179,11 @@ function setup_env() {
 # Checks that requiring FPR can only be used for tag/commit if signing is
 # required for tag/commit.
 function parse_input() {
-    REQUIRE_SIGNED_COMMITS=${INPUT_REQUIRE_SIGNED_COMMITS:-false}
-    REQUIRE_COMMIT_SIGNING_FPR=${INPUT_REQUIRE_COMMIT_SIGNING_FPR:-}
-    REQUIRE_SIGNED_TAGS=${INPUT_REQUIRE_SIGNED_TAGS:-true}
-    REQUIRE_TAG_SIGNING_FPR=${INPUT_REQUIRE_TAG_SIGNING_FPR:-}
+    REQUIRE_SIGNED_COMMITS="${INPUT_REQUIRE_SIGNED_COMMITS:-false}"
+    REQUIRE_COMMIT_SIGNING_FPR="${INPUT_REQUIRE_COMMIT_SIGNING_FPR:-}"
+    REQUIRE_SIGNED_TAGS="${INPUT_REQUIRE_SIGNED_TAGS:-true}"
+    REQUIRE_TAG_SIGNING_FPR="${INPUT_REQUIRE_TAG_SIGNING_FPR:-}"
+    GPG_IMPORT_KEYS_DIR="${INPUT_GPG_IMPORT_KEYS_DIR:-.gpg/import-keys}"
 
     if [ "$REQUIRE_SIGNED_COMMITS" = false ] && [ ! "$REQUIRE_COMMIT_SIGNING_FPR" = "" ] ; then
         error "Cannot require commit signing FPR but not require signing commits!"
@@ -197,12 +198,22 @@ function parse_input() {
     debug "REQUIRE_SIGNED_TAGS=$REQUIRE_SIGNED_TAGS"
     debug "REQUIRE_TAG_SIGNING_FPR=$REQUIRE_TAG_SIGNING_FPR"
     debug "REQUIRE_COMMIT_SIGNING_FPR=$REQUIRE_COMMIT_SIGNING_FPR"
+    debug "GPG_IMPORT_KEYS_DIR=$GPG_IMPORT_KEYS_DIR"
+}
+
+function import_keys() {
+    debug "Scanning dir for gpg keys: $GPG_IMPORT_KEYS_DIR"
+    for file in "$GPG_IMPORT_KEYS_DIR"/*.gpg ; do
+        debug "Import key: $file"
+        $GPG --import $file
+    done
 }
 
 # Runs the verification process based on env variabes and inputs
 function run() {
     setup_env
     parse_input
+    import_keys
     verify "$START_COMMIT" "$END_COMMIT"
 }
 

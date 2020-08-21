@@ -15,13 +15,13 @@ inputs:
     require_commit_signing_fpr:
         description: 'Required commits to be signed with a key associated with this primary key FPR'
         required: false
+    gpg_import_keys_dir:
+        description: 'Dir with a number of exported public keys gpg will import for sig verification.'
+        required: false
+        default: .gpg/import-keys
 runs:
     using: "composite"
     steps:
-        - run: |
-            gpg2 --list-keys
-            gpg2 --recv-keys ${{ inputs.require_tag_signing_fpr }} ${{ inputs.require_commit_signing_fpr }}
-          shell: bash
         - run: |
             git config gpg.program gpg2
             git config gpgv.program gpg2
