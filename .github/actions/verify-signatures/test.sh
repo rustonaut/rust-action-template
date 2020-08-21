@@ -254,7 +254,7 @@ function verify_entity() {
     esac
 }
 
-OUT=$(verify from_ref to_ref)
+OUT=$(verify from_ref)
 assert_eq "$OUT" "::debug::Checking Commit cf968a8d04e7111cbebbe256dcfd9b77afd8133b
 ::debug::Checking Commit aa968a8d04e7111cbebbe256dcfd9b77afd8133b
 ::debug::Checking Tag v000"

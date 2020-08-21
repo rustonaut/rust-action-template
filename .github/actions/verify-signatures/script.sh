@@ -144,7 +144,6 @@ function lookupFPR() {
 #
 function verify() {
     local FROM="$1"
-    local TO="$2"
     $GIT rev-list $FROM.. |
     while read commit; do
         debug "Checking Commit $commit"
@@ -162,9 +161,8 @@ function verify() {
 function setup_env() {
     START_COMMIT="${GITHUB_BASE_REF:-nightly}"
 
-    debug "GITHUB_BASE_REF=$GITHUB_BASE_REF"
+    debug "GITHUB_BASE_REF=${GITHUB_BASE_REF:-**not set**}"
     debug "START_COMMIT=$START_COMMIT"
-    debug "END_COMMIT=$END_COMMIT"
 }
 
 # Sets env variables based on the github action `INPUT_` env variables.
