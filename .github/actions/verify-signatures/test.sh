@@ -204,8 +204,9 @@ test verify iterates_properly
 function mock_git() {
     case "$1" in
         "rev-list")
-            assert_eq $2 "from_ref.."
-            assert_eq $# 2
+            assert_eq $2 "from_ref..to_ref"
+            assert_eq $3 "--"
+            assert_eq $# 3
             echo "cf968a8d04e7111cbebbe256dcfd9b77afd8133b"
             echo "aa968a8d04e7111cbebbe256dcfd9b77afd8133b"
             ;;
@@ -254,7 +255,7 @@ function verify_entity() {
     esac
 }
 
-OUT=$(verify from_ref)
+OUT=$(verify from_ref to_ref)
 assert_eq "$OUT" "::debug::Checking Commit cf968a8d04e7111cbebbe256dcfd9b77afd8133b
 ::debug::Checking Commit aa968a8d04e7111cbebbe256dcfd9b77afd8133b
 ::debug::Checking Tag v000"

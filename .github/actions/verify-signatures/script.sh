@@ -144,7 +144,8 @@ function lookupFPR() {
 #
 function verify() {
     local FROM="$1"
-    $GIT rev-list $FROM.. |
+    local TO="$2"
+    $GIT rev-list "$FROM..$TO" -- |
     while read commit; do
         debug "Checking Commit $commit"
         verify_entity commit $commit
@@ -159,10 +160,18 @@ function verify() {
 
 # Sets some env variables based on other env variables (GITHUB_BASE_REF,GITHUB_REF)
 function setup_env() {
-    START_COMMIT="${GITHUB_BASE_REF:-nightly}"
-
     debug "GITHUB_BASE_REF=${GITHUB_BASE_REF:-**not set**}"
+    debug "GITHUB_REF=${GITHUB_REF:-**not set**}"
+
+    START_COMMIT="refs/remotes/origin/${GITHUB_BASE_REF:-nightly}"
+    END_COMMIT="${GITHUB_REF:?GITHUB_REF is required}"
+
+    if [ "${END_COMMIT:0:10}" = "refs/pull/" ] ; then
+        END_COMMIT="refs/remotes/${END_COMMIT:5}"
+    fi
+
     debug "START_COMMIT=$START_COMMIT"
+    debug "END_COMMIT=$END_COMMIT"
 }
 
 # Sets env variables based on the github action `INPUT_` env variables.
@@ -194,7 +203,7 @@ function parse_input() {
 function run() {
     setup_env
     parse_input
-    verify "$START_COMMIT"
+    verify "$START_COMMIT" "$END_COMMIT"
 }
 
 # Only run if we aren't currently testing.

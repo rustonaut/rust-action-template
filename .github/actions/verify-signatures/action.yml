@@ -18,5 +18,9 @@ inputs:
 runs:
     using: "composite"
     steps:
+        - run: git fetch origin nightly:refs/remotes/origin/nightly
+          shell: bash
+        - run: git show-ref
+          shell: bash
         - run: ${{ github.action_path }}/script.sh
           shell: bash
