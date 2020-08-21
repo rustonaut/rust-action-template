@@ -50,7 +50,7 @@ function escapeMessage() {
 function showDetails() {
     local TYPE="$1"
     local ENTITY="$2"
-    warn "$($GIT show $ENTITY 2>&1 || true)"
+    warn "$($GIT show --quiet --show-signature $ENTITY 2>&1 || true)"
 }
 
 # Given a entity type and id verifies if it's signature is valid
