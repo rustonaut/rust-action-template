@@ -161,9 +161,9 @@ function verify() {
 # Sets some env variables based on other env variables (GITHUB_BASE_REF,GITHUB_REF)
 function setup_env() {
     START_COMMIT="${GITHUB_BASE_REF:-nightly}"
-    # TODO check this
-    END_COMMIT="${GITHUB_REF:-HEAD}"
+    END_COMMIT="HEAD"
 
+    debug "GITHUB_BASE_REF=$GITHUB_BASE_REF"
     debug "START_COMMIT=$START_COMMIT"
     debug "END_COMMIT=$END_COMMIT"
 }
