@@ -1,0 +1,27 @@
+name: On PR rust related checks.
+on:
+  pull_request:
+    type: [opened, reopened, synchronize]
+
+
+jobs:
+  style:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Check cargo fmt
+        run: cargo fmt -- --check
+      - name: Check clippy
+        run: cargo clippy
+
+  functionality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Check build
+        run: cargo build --verbose
+        # If not WIP: prefix then cargo build --verbose ??option to inject deny(warning)??
+      - name: Run tests
+        run: cargo test --verbose
+        # cargo test --no-default-features --verbose
+        # cargo test --all-features --verbose
