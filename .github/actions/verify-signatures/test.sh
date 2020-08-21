@@ -151,11 +151,18 @@ assert_eq "$OUT" "::error::Failed to find good signature for tag v0"
 test verify_entity valid_fpr_required
 
 backup_function gpg_output_for_git_verify_entity
-GPG_STATUS_MOCK="$GPG_STATUS_MOCK_VALID"
+declare __GPG_STATUS_MOCK
 function gpg_output_for_git_verify_entity() {
     assert_eq $1 v0
-    echo "$GPG_STATUS_MOCK" 1>&2
+    echo "$__GPG_STATUS_MOCK" 1>&2
 }
+function set_gpg_status_mock() {
+    __GPG_STATUS_MOCK="$1"
+    assert_eq "$#" 1
+}
+
+set_gpg_status_mock "$GPG_STATUS_MOCK_VALID"
+
 REQUIRE_SIGNED_TAGS="true"
 REQUIRE_TAG_SIGNING_FPR="F6911C8376111105830FDE32DC653E72D02B615E"
 verify_entity tag v0
@@ -175,7 +182,7 @@ verify_entity tag v0
 test verify_entity invalid_signing_required_but_not_given
 REQUIRE_SIGNED_TAGS="true"
 REQUIRE_TAG_SIGNING_FPR=""
-GPG_STATUS_MOCK=""
+set_gpg_status_mock ""
 EC=0
 OUT="$(verify_entity tag v0)" || EC=$?
 assert_eq $EC 1
@@ -184,7 +191,7 @@ assert_eq "$OUT" "::error::The tag v0 needs to be signed"
 test verify_entity valid_signing_not_required_and_not_given
 REQUIRE_SIGNED_TAGS="false"
 REQUIRE_TAG_SIGNING_FPR=""
-GPG_STATUS_MOCK=""
+set_gpg_status_mock ""
 # No f* idea but somehow stdout is surpressed if it isn't run in a capturing subshell?
 OUT=$(verify_entity tag v0)
 assert_eq "$OUT" "::debug::Skipping non signed tag"
@@ -194,7 +201,7 @@ assert_eq "$OUT" "::debug::Skipping non signed tag"
 test verify_entity invalid_signing_not_required_but_malformed
 REQUIRE_SIGNED_TAGS="false"
 REQUIRE_TAG_SIGNING_FPR=""
-GPG_STATUS_MOCK="$GPG_STATUS_MOCK_INVALID"
+set_gpg_status_mock "$GPG_STATUS_MOCK_INVALID"
 EC=0
 OUT=$(verify_entity tag v0) || EC=$?
 assert_eq $EC 1
@@ -205,7 +212,7 @@ REQUIRE_SIGNED_COMMITS="false"
 REQUIRE_SIGNED_TAGS="false"
 REQUIRE_TAG_SIGNING_FPR=""
 REQUIRE_COMMIT_SIGNING_FPR=""
-GPG_STATUS_MOCK="[GNUPG:] NEWSIG
+set_gpg_status_mock "[GNUPG:] NEWSIG
 [GNUPG:] ERRSIG 4AEE18F83AFDEB23 1 8 00 1598024984 9
 [GNUPG:] NO_PUBKEY 4AEE18F83AFDEB23
 "
@@ -283,7 +290,7 @@ REQUIRE_SIGNED_COMMITS="false"
 REQUIRE_SIGNED_TAGS="false"
 REQUIRE_TAG_SIGNING_FPR=""
 REQUIRE_COMMIT_SIGNING_FPR=""
-GPG_STATUS_MOCK="[GNUPG:] NEWSIG
+set_gpg_status_mock "[GNUPG:] NEWSIG
 [GNUPG:] ERRSIG 4AEE18F83AFDEB23 1 8 00 1598024984 9
 [GNUPG:] NO_PUBKEY 4AEE18F83AFDEB23
 "

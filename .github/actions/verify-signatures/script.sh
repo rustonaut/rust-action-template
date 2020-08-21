@@ -89,7 +89,7 @@ function verify_entity() {
 # The exit code is always 0, use the output to determine details.
 function gpg_output_for_git_verify_entity() {
     # We use the output exit code doesn't matter
-    $GIT verify-$TYPE --raw -- $1 || return 0
+    $GIT verify-$TYPE --raw -- $1 || true
 }
 
 # Verifies if a output of `git verify-tag/commit --raw` indicates a valid signature.
