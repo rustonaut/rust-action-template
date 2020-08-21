@@ -94,8 +94,14 @@ function verify_entity() {
 
     debug "Checking signature."
 
-    gpg_verify "$TYPE" "$ENTITY" "$REQUIRED_FPR" <<<"$PIPE_IT"
+    local EXIT_CODE=0
+    gpg_verify "$TYPE" "$ENTITY" "$REQUIRED_FPR" <<<"$PIPE_IT" || EXIT_CODE=$?
 
+    if [ ! "$EXIT_CODE" = 0 ] ; then
+        debug "$PIPE_IT"
+    fi
+
+    return $EXIT_CODE;
 }
 
 # Runs git verify-tag/verify-commit --raw
