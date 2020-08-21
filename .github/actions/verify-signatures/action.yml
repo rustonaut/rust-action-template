@@ -18,12 +18,13 @@ inputs:
 runs:
     using: "composite"
     steps:
-        - run: git fetch origin nightly:refs/remotes/origin/nightly
-          shell: bash
-        - run: gpg2 --list-keys
+        - run: |
+            gpg2 --list-keys
+            gpg2 --recv-keys ${{ inputs.require_tag_signing_fpr }} ${{ inputs.require_commit_signing_fpr }}
           shell: bash
         - run: |
             git config gpg.program gpg2
             git config gpgv.program gpg2
+            git fetch origin nightly:refs/remotes/origin/nightly
             ${{ github.action_path }}/script.sh
           shell: bash
