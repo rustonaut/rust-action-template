@@ -47,6 +47,12 @@ function escapeMessage() {
 }
 
 
+function showDetails() {
+    local TYPE="$1"
+    local ENTITY="$2"
+    warn "$($GIT show $ENTITY 2>&1 || true)"
+}
+
 # Given a entity type and id verifies if it's signature is valid
 #
 # The type must be `tag` or `commit` depending on it either the
@@ -79,22 +85,18 @@ function verify_entity() {
         return $FAILURE_EXIT_CODE
     fi
 
-    debug "Calling git verify-*"
     PIPE_IT="$(gpg_output_for_git_verify_entity $ENTITY 2>&1 1>/dev/null)"
 
-    debug "Consider no signature case."
     if [ "${#PIPE_IT}" = "0" ] ; then
         if [  "$SIGNING_REQUIRED" = "true" ] ; then
             error "The $TYPE $ENTITY needs to be signed"
-            warn "$(git show "$ENTITY" 2>&1)"
+            showDetails "$TYPE" "$ENTITY"
             return $FAILURE_EXIT_CODE
         else
             debug "Skipping non signed $TYPE"
             return 0
         fi
     fi
-
-    debug "Checking signature."
 
     local EXIT_CODE=0
     gpg_verify "$TYPE" "$ENTITY" "$REQUIRED_FPR" <<<"$PIPE_IT" || EXIT_CODE=$?
@@ -139,7 +141,6 @@ function gpg_verify() {
             FPR=$(lookupFPR $KEY)
             if [ ! "$REQUIRED_FPR" = "" ] && [ ! "$FPR" = "$REQUIRED_FPR" ] ; then
                 warn "Signed $TYPE $ENTITY with wrong key. Expected $REQUIRED_FPR, found $FPR"
-                warn "$(git show $ENTITY 2>&1)"
             else
                 EXIT_CODE=0
             fi
@@ -148,11 +149,8 @@ function gpg_verify() {
     ) || EXIT_CODE=$?
 
     if [ ! "$EXIT_CODE" = 0 ] ; then
-        debug "Debug failed to find good signature"
         error "Failed to find good signature for $TYPE $ENTITY"
-        warn "$(git show "$ENTITY" 2>&1)"
-        return $FAILURE_EXIT_CODE
-
+        showDetails "$TYPE" "$ENTITY"
     fi
 
     return $EXIT_CODE
@@ -173,21 +171,28 @@ function lookupFPR() {
 function verify() {
     local FROM="$1"
     local TO="$2"
-    $GIT rev-list "$FROM..$TO" -- |
-    while read commit; do
-        startGroup $commit
-        debug "Checking Commit $commit"
-        verify_entity commit $commit
-        debug "Getting tags for $commit"
-        $GIT tag --points-at $commit |
-        while read tag; do
-            startGroup "$tag"
-            debug "Checking Tag $tag"
-            verify_entity tag $tag
+    $GIT rev-list "$FROM..$TO" -- | (
+        local EXIT_CODE=0
+        while read commit; do
+            startGroup "commit: $commit"
+            verify_entity commit $commit
+            EXIT_CODE=$((EXIT_CODE|$?))
+            $GIT tag --points-at $commit | (
+                local EXIT_CODE=0
+                while read tag; do
+                    startGroup "tag: $tag"
+                    verify_entity tag $tag
+                    EXIT_CODE=$((EXIT_CODE|$?))
+                    endGroup
+                done
+                return $EXIT_CODE
+            )
+            EXIT_CODE=$((EXIT_CODE|$?))
             endGroup
         done
-        endGroup
-    done
+        return $EXIT_CODE
+    )
+    return $?
 }
 
 
