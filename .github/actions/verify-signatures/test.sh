@@ -204,7 +204,7 @@ test verify iterates_properly
 function mock_git() {
     case "$1" in
         "rev-list")
-            assert_eq $2 "from_ref..to_ref"
+            assert_eq $2 "from_ref.."
             assert_eq $# 2
             echo "cf968a8d04e7111cbebbe256dcfd9b77afd8133b"
             echo "aa968a8d04e7111cbebbe256dcfd9b77afd8133b"
