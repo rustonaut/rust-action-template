@@ -17,8 +17,7 @@ inputs:
         required: false
     gpg_import_keys_dir:
         description: 'Dir with a number of exported public keys gpg will import for sig verification.'
-        required: true
-        default: .gpg/import-keys
+        required: false
 runs:
     using: "composite"
     steps:
