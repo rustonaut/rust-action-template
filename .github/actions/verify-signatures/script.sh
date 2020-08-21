@@ -69,7 +69,7 @@ function verify_entity() {
         error "(internal) Only support verify tag/commit but not $ENTITY" || return $?
     fi
 
-    PIPE_IT="$(gpg_output_for_git_verify_entity $ENTITY)"
+    PIPE_IT="$(gpg_output_for_git_verify_entity $ENTITY 2>&1 1>/dev/null)"
 
     if [ "${#PIPE_IT}" = "0" ] ; then
         if [  "$SIGNING_REQUIRED" = "true" ] ; then

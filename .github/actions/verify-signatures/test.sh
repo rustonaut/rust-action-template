@@ -154,7 +154,7 @@ backup_function gpg_output_for_git_verify_entity
 GPG_STATUS_MOCK="$GPG_STATUS_MOCK_VALID"
 function gpg_output_for_git_verify_entity() {
     assert_eq $1 v0
-    echo "$GPG_STATUS_MOCK"
+    echo "$GPG_STATUS_MOCK" 1>&2
 }
 REQUIRE_SIGNED_TAGS="true"
 REQUIRE_TAG_SIGNING_FPR="F6911C8376111105830FDE32DC653E72D02B615E"
@@ -199,6 +199,21 @@ EC=0
 OUT=$(verify_entity tag v0) || EC=$?
 assert_eq $EC 1
 assert_eq "$OUT" "::error::Failed to find good signature for tag v0"
+
+test verify_entity bad_commit_signature
+REQUIRE_SIGNED_COMMITS="false"
+REQUIRE_SIGNED_TAGS="false"
+REQUIRE_TAG_SIGNING_FPR=""
+REQUIRE_COMMIT_SIGNING_FPR=""
+GPG_STATUS_MOCK="[GNUPG:] NEWSIG
+[GNUPG:] ERRSIG 4AEE18F83AFDEB23 1 8 00 1598024984 9
+[GNUPG:] NO_PUBKEY 4AEE18F83AFDEB23
+"
+EC=0
+OUT=$(verify_entity commit v0) || EC=$?
+assert_eq $EC 1
+assert_eq "$OUT" "::error::Failed to find good signature for commit v0"
+
 
 test verify iterates_properly
 function mock_git() {
