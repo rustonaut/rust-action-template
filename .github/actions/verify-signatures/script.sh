@@ -234,6 +234,8 @@ function import_keys() {
         debug "Import key: $file"
         $GPG --import $file
     done
+
+    debug "$($GPG --list-keys 2>&1)"
 }
 
 # Runs the verification process based on env variabes and inputs
