@@ -1,0 +1,25 @@
+name: 'WIP Check'
+description: "Check if the PR's title starts with WIP"
+inputs:
+  fail-on-wip:
+    description: "Fails with an error message if it's WIP to prevent accidental WIP merges."
+    default: true
+    required: false
+outputs:
+  is-wip:
+    description: "True if this is a WIP Pull Request, else false"
+    value: ${{ steps.wip-check.outputs.is-wip }}
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/github-script@v3
+      id: wip-check
+      with:
+        script: |
+          const pr = context.payload.pull_request;
+          const issue_resp = await github.issues.get(pr);
+          const is_wip = issue_resp.data.title.startsWith("WIP:")
+          core.setOutput("is-wip", is_wip)
+          if (${{ inputs.fail-on-wip }} == "true" && is_wip) {
+            core.setFailure("Can not merge WIP Pull Requests!")
+          }
