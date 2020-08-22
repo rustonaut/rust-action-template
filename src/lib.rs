@@ -11,5 +11,7 @@ mod tests {
 
     #[cfg(feature = "nay")]
     #[test]
-    fn nay_test() {}
+    fn nay_test() {
+        panic!("fail this");
+    }
 }
