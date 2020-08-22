@@ -1,7 +1,7 @@
 name: On PR rust related checks.
 on:
   pull_request:
-    type: [opened, reopened, edit, synchronize]
+    type: [opened, reopened, edited, synchronize]
 
 jobs:
   #TODO make this an action (even through we will still run it as a job here)
