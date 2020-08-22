@@ -19,6 +19,8 @@ jobs:
     outputs:
       is-wip: ${{ steps.wip-check.outputs.is-wip }}
     steps:
+      # We need to checkout to access local actions.
+      - uses: actions/checkout@v1
       - uses: ./.github/actions/wip-check
         with:
           fail-on-wip: true
