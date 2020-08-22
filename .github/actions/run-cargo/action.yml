@@ -78,4 +78,5 @@ runs:
             }
 
             debug_cmd cargo "${params[@]}"
+            echo "::debug::RUSTFLAGS=$RUSTFLAGS"
             cargo "${params[@]}"
