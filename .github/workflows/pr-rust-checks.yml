@@ -1,6 +1,12 @@
 name: On PR rust related checks.
 on:
   pull_request:
+    #BUG: Edited seems to not really be what it seems,
+    #     at least the view times I tried editing title
+    #     or description of the PR doesn't trigger this.
+    #     This mean after removing `WIP:` you need to
+    #     trigger a re-run manually, duh. Github should
+    #     just add first party `WIP:` support.
     type: [opened, reopened, edited, synchronize]
 
 jobs:
