@@ -20,7 +20,7 @@ jobs:
             const pr = context.payload.pull_request;
             const issue_resp = await github.issues.get(pr);
             const is_wip = issue_resp.data.title.startsWith("WIP:")
-            core.setOutput("is-wip", is_wip)
+            core.setOutput("is-wip", true)//is_wip)
             if (is_wip) {
               core.setFailure("Can not merge WIP Pull Requests!")
             }
