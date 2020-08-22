@@ -79,4 +79,11 @@ runs:
 
             debug_cmd cargo "${params[@]}"
             echo "::debug::RUSTFLAGS=$RUSTFLAGS"
-            cargo "${params[@]}"
+            EXIT_CODE=0
+            cargo "${params[@]}" || EXIT_CODE=$?
+
+            if [ ! "$EXIT_CODE" = 0 ] ; then
+              echo ::error::Failed to run cargo ${params[0]}.
+            fi
+
+            exit $EXIT_CODE
