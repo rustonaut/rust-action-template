@@ -16,8 +16,9 @@ jobs:
   functionality:
     runs-on: ubuntu-latest
     strategy:
-      rust_version: [ "stable", "beta" ]
-      features: [ "", "default", "*" ]
+      matrix:
+        rust_version: [ "stable", "beta" ]
+        features: [ "", "default", "*" ]
     steps:
       - uses: actions/checkout@v1
 
@@ -27,7 +28,7 @@ jobs:
           toolchain: ${{ matrix.rust_version }}
 
       - name: Check build
-        uses: .github/actions/run-cargo
+        uses: ./.github/actions/run-cargo
         with:
           cmd: build
           features: ${{ matrix.features }}
@@ -35,7 +36,7 @@ jobs:
           deny_warnings: true
 
       - name: Run tests
-        uses: .github/actions/run-cargo
+        uses: ./.github/actions/run-cargo
         with:
           cmd: test
           features: ${{ matrix.features }}
