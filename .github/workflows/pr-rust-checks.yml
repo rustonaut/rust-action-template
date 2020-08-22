@@ -1,11 +1,42 @@
 name: On PR rust related checks.
 on:
   pull_request:
-    type: [opened, reopened, synchronize]
+    type: [opened, reopened, edit, synchronize]
 
 jobs:
+  #TODO make this an action (even through we will still run it as a job here)
+  # so that we can reuse it in cargo-audit.yml to only run audit when we either
+  # where triggered by schedule or if not is-wip (also only do the is-wip check
+  # if we where not triggered by schedule)
+  wip-check:
+    runs-on: ubuntu-latest
+    outputs:
+      is-wip: ${{ steps.wip-check.outputs.is-wip }}
+    steps:
+      uses: actions/github-script@v3
+      id: wip-check
+      with:
+        script: |
+          const pr = context.payload.pull_request;
+          const issue_resp = await github.issues.get(pr);
+          const is_wip = issue_resp.data.title.startsWith("WIP:")
+          core.setOutput("is-wip", is_wip)
+
+  fail-wip:
+    run-on: ubuntu-latest
+    if: ${{ needs.wip-check.outputs.is-wip }}
+    needs: wip-check
+    steps:
+      - uses: actions/checkout@v1
+      - name: "Fail pipeline because it's WIP."
+        runs: |
+          echo "::error::Can not merge WIP Pull Requests!"
+          exit 1
+
   style:
     runs-on: ubuntu-latest
+    if: ${{ ! needs.wip-check.outputs.is-wip }}
+    needs: wip-check
     steps:
       - uses: actions/checkout@v1
       - name: Check cargo fmt
@@ -15,18 +46,18 @@ jobs:
 
   functionality:
     runs-on: ubuntu-latest
+    if: ${{ ! needs.wip-check.outputs.is-wip }}
+    needs: wip-check
     strategy:
       matrix:
         rust_version: [ "stable", "beta" ]
         features: [ "", "default", "*" ]
     steps:
       - uses: actions/checkout@v1
-
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: ${{ matrix.rust_version }}
-
       - name: Check build
         uses: ./.github/actions/run-cargo
         with:
@@ -34,7 +65,6 @@ jobs:
           features: ${{ matrix.features }}
           verbose: true
           deny_warnings: true
-
       - name: Run tests
         uses: ./.github/actions/run-cargo
         with:
@@ -42,3 +72,15 @@ jobs:
           features: ${{ matrix.features }}
           verbose: true
           deny_warnings: true
+
+  signatures:
+    runs-on: ubuntu-latest
+    if: ${{ ! needs.wip-check.outputs.is-wip }}
+    needs: wip-check
+    steps:
+      - uses: actions/checkout@v1
+      - uses: ./.github/actions/verify-signatures
+        with:
+          require_signed_commits: false
+          require_signed_tags: true
+          require_tag_signing_fpr: ${{ secrets.TagSigningFpr }}
