@@ -37,10 +37,15 @@ jobs:
     needs: wip-check
     steps:
       - uses: actions/checkout@v1
-      - name: Check cargo fmt
-        run: cargo fmt -- --check
-      - name: Check clippy
-        run: cargo clippy
+      - name: cargo fmt check
+        uses: ./.github/actions/run-cargo
+        with:
+          cmd: fmt
+          fmt-check: true
+      - name: cargo clippy check
+        uses: ./.github/actions/run-cargo
+        with:
+          cmd: clippy
 
   functionality:
     runs-on: ubuntu-latest
