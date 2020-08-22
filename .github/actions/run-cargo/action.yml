@@ -35,10 +35,12 @@ runs:
           run: |
             set -euo pipefail
             declare -a params
+            declare -x RUSTFLAGS=""
+
             params+=("${{ inputs.cmd }}")
 
             if [ "${{ inputs.deny_warnings }}" = "true" ] ; then
-              params+=("-D" "warnings")
+              RUSTFLAGS="$RUSTFLAGS -D warnings"
             fi
 
             case "${{ inputs.features }}" in
