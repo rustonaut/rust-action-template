@@ -13,17 +13,17 @@ jobs:
     outputs:
       is-wip: ${{ steps.wip-check.outputs.is-wip }}
     steps:
-      uses: actions/github-script@v3
-      id: wip-check
-      with:
-        script: |
-          const pr = context.payload.pull_request;
-          const issue_resp = await github.issues.get(pr);
-          const is_wip = issue_resp.data.title.startsWith("WIP:")
-          core.setOutput("is-wip", is_wip)
+      - uses: actions/github-script@v3
+        id: wip-check
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const issue_resp = await github.issues.get(pr);
+            const is_wip = issue_resp.data.title.startsWith("WIP:")
+            core.setOutput("is-wip", is_wip)
 
   fail-wip:
-    run-on: ubuntu-latest
+    runs-on: ubuntu-latest
     if: ${{ needs.wip-check.outputs.is-wip }}
     needs: wip-check
     steps:
