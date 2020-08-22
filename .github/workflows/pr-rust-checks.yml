@@ -21,20 +21,13 @@ jobs:
             const issue_resp = await github.issues.get(pr);
             const is_wip = issue_resp.data.title.startsWith("WIP:")
             core.setOutput("is-wip", is_wip)
-
-  fail-wip:
-    runs-on: ubuntu-latest
-    if: ${{ needs.wip-check.outputs.is-wip == 'true' }}
-    needs: wip-check
-    steps:
-      - name: "Fail pipeline because it's WIP."
-        run: |
-          echo "::error::Can not merge WIP Pull Requests!"
-          exit 1
+            if (is_wip) {
+              core.setFailure("Can not merge WIP Pull Requests!")
+            }
 
   style:
     runs-on: ubuntu-latest
-    if: ${{ needs.wip-check.outputs.is-wip != 'true' }}
+    if: ${{ success() && needs.wip-check.outputs.is-wip != 'true' }}
     needs: wip-check
     steps:
       - uses: actions/checkout@v1
@@ -45,7 +38,7 @@ jobs:
 
   # functionality:
   #   runs-on: ubuntu-latest
-  #   if: ${{ needs.wip-check.outputs.is-wip != 'true' }}
+  #   if: ${{ success() && needs.wip-check.outputs.is-wip != 'true' }}
   #   needs: wip-check
   #   strategy:
   #     matrix:
@@ -74,7 +67,7 @@ jobs:
 
   # signatures:
   #   runs-on: ubuntu-latest
-  #   if: ${{ needs.wip-check.outputs.is-wip != 'true' }}
+  #   if: ${{ success() && needs.wip-check.outputs.is-wip != 'true' }}
   #   needs: wip-check
   #   steps:
   #     - uses: actions/checkout@v1
