@@ -27,22 +27,21 @@ jobs:
     if: ${{ needs.wip-check.outputs.is-wip }}
     needs: wip-check
     steps:
-      - uses: actions/checkout@v1
       - name: "Fail pipeline because it's WIP."
         run: |
           echo "::error::Can not merge WIP Pull Requests!"
           exit 1
 
-  # style:
-  #   runs-on: ubuntu-latest
-  #   if: ${{ ! needs.wip-check.outputs.is-wip }}
-  #   needs: wip-check
-  #   steps:
-  #     - uses: actions/checkout@v1
-  #     - name: Check cargo fmt
-  #       run: cargo fmt -- --check
-  #     - name: Check clippy
-  #       run: cargo clippy
+  style:
+    runs-on: ubuntu-latest
+    if: ${{ ! needs.wip-check.outputs.is-wip }}
+    needs: wip-check
+    steps:
+      - uses: actions/checkout@v1
+      - name: Check cargo fmt
+        run: cargo fmt -- --check
+      - name: Check clippy
+        run: cargo clippy
 
   # functionality:
   #   runs-on: ubuntu-latest
