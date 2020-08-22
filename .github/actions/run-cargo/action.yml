@@ -26,7 +26,7 @@ inputs:
     required: false
   verbose:
     description: "Adds the --verbose flag"
-    default: true
+    default: false
     required: false
   fmt_check:
     description: |
@@ -76,7 +76,7 @@ runs:
 
             params+=("--")
 
-            if [ ! "${{ inputs.cmd }}" = "fmt" ] ; then
+            if [ "${{ inputs.cmd }}" = "fmt" ] ; then
               if [ ! "${{ inputs.fmt_check }}" = "false" ] ; then
                 params+=("--check")
               fi

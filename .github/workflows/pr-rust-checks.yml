@@ -41,7 +41,6 @@ jobs:
         uses: ./.github/actions/run-cargo
         with:
           cmd: fmt
-          fmt-check: true
       - name: cargo clippy check
         uses: ./.github/actions/run-cargo
         with:
