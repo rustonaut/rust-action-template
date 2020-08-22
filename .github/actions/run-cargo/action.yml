@@ -33,6 +33,7 @@ runs:
     steps:
         - shell: bash
           run: |
+            set -euo pipefail
             declare -a params
             params+=("$INPUT_CMD")
 
@@ -64,4 +65,15 @@ runs:
               params+=("--verbose")
             fi
 
+            function debug_cmd() {
+              echo "::debug::cmd: \"$1\""
+              shift
+              echo "::debug::params:"
+              while [ "$#" -gt 0 ] ; do
+                echo "::debug::- \"$1\""
+                shift
+              done
+            }
+
+            debug_cmd cargo "${params[@]}"
             cargo "${params[@]}"
