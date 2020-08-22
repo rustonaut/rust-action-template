@@ -24,7 +24,7 @@ jobs:
 
   fail-wip:
     runs-on: ubuntu-latest
-    if: ${{ needs.wip-check.outputs.is-wip }}
+    if: ${{ needs.wip-check.outputs.is-wip == 'true' }}
     needs: wip-check
     steps:
       - name: "Fail pipeline because it's WIP."
@@ -34,7 +34,7 @@ jobs:
 
   style:
     runs-on: ubuntu-latest
-    if: ${{ ! needs.wip-check.outputs.is-wip }}
+    if: ${{ needs.wip-check.outputs.is-wip != 'true' }}
     needs: wip-check
     steps:
       - uses: actions/checkout@v1
@@ -45,7 +45,7 @@ jobs:
 
   # functionality:
   #   runs-on: ubuntu-latest
-  #   if: ${{ ! needs.wip-check.outputs.is-wip }}
+  #   if: ${{ needs.wip-check.outputs.is-wip != 'true' }}
   #   needs: wip-check
   #   strategy:
   #     matrix:
@@ -74,7 +74,7 @@ jobs:
 
   # signatures:
   #   runs-on: ubuntu-latest
-  #   if: ${{ ! needs.wip-check.outputs.is-wip }}
+  #   if: ${{ needs.wip-check.outputs.is-wip != 'true' }}
   #   needs: wip-check
   #   steps:
   #     - uses: actions/checkout@v1
