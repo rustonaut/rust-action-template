@@ -65,14 +65,14 @@ jobs:
           verbose: true
           deny_warnings: true
 
-  # signatures:
-  #   runs-on: ubuntu-latest
-  #   if: ${{ success() && needs.wip-check.outputs.is-wip != 'true' }}
-  #   needs: wip-check
-  #   steps:
-  #     - uses: actions/checkout@v1
-  #     - uses: ./.github/actions/verify-signatures
-  #       with:
-  #         require_signed_commits: false
-  #         require_signed_tags: true
-  #         require_tag_signing_fpr: ${{ secrets.TagSigningFpr }}
+  signatures:
+    runs-on: ubuntu-latest
+    if: ${{ success() && needs.wip-check.outputs.is-wip != 'true' }}
+    needs: wip-check
+    steps:
+      - uses: actions/checkout@v1
+      - uses: ./.github/actions/verify-signatures
+        with:
+          require_signed_commits: false
+          require_signed_tags: true
+          require_tag_signing_fpr: ${{ secrets.TagSigningFpr }}
