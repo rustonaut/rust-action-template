@@ -10,24 +10,24 @@ jobs:
   auto-publish:
     runs-on: ubuntu-latest
     steps:
+      # TODO implement:
+      #  iterate over commits which got just pushed
+      #  look for tags
+      #  check all tags for signature + FPR + regex (vX.X.X) and store them + their commit
+      #  then iterate all stored tags and
+      #    checkout given commit
+      #    run cargo login
+      #    run cargo publish
+      # - uses: ./.github/actions/auto-publish
+      #   with:
+      #     require_tag_signing_fpr: ${{ secrets.TagSigningFpr }}
+      #     publishing_key: ${{ secrets.CARGO_PUBLISHING_KEY }}
       - uses: actions/checkout@v1
-        # TODO implement:
-        #  iterate over commits which got just pushed
-        #  look for tags
-        #  check all tags for signature + FPR + regex (vX.X.X) and store them + their commit
-        #  then iterate all stored tags and
-        #    checkout given commit
-        #    run cargo login
-        #    run cargo publish
-        # - uses: ./.github/actions/auto-publish
-        #   with:
-        #     require_tag_signing_fpr: ${{ secrets.TagSigningFpr }}
-        #     publishing_key: ${{ secrets.CARGO_PUBLISHING_KEY }}
-        - name: Test things out
-          run: |
-            echo "$GITHUB_BASE_REF"
-            echo "$GITHUB_REF"
-            printenv
-            git show-ref
-            git branch -a
-            git rev-list "$GITHUB_BASE_REF".."$GITHUB_REF"
+      - name: Test things out
+        run: |
+          echo "$GITHUB_BASE_REF"
+          echo "$GITHUB_REF"
+          printenv
+          git show-ref
+          git branch -a
+          git rev-list "$GITHUB_BASE_REF".."$GITHUB_REF"
