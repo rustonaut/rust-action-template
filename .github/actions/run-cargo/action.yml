@@ -1,5 +1,5 @@
 name: 'Runs Cargo'
-description: 'Runs cargo, assuming it's available in the path.'
+description: "Runs cargo, assuming it's available in the path."
 inputs:
   cmd:
     description: 'The subcommand to run (build/test)'
