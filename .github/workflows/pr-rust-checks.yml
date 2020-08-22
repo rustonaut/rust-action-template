@@ -36,34 +36,34 @@ jobs:
       - name: Check clippy
         run: cargo clippy
 
-  # functionality:
-  #   runs-on: ubuntu-latest
-  #   if: ${{ success() && needs.wip-check.outputs.is-wip != 'true' }}
-  #   needs: wip-check
-  #   strategy:
-  #     matrix:
-  #       rust_version: [ "stable", "beta" ]
-  #       features: [ "", "default", "*" ]
-  #   steps:
-  #     - uses: actions/checkout@v1
-  #     - uses: actions-rs/toolchain@v1
-  #       with:
-  #         profile: minimal
-  #         toolchain: ${{ matrix.rust_version }}
-  #     - name: Check build
-  #       uses: ./.github/actions/run-cargo
-  #       with:
-  #         cmd: build
-  #         features: ${{ matrix.features }}
-  #         verbose: true
-  #         deny_warnings: true
-  #     - name: Run tests
-  #       uses: ./.github/actions/run-cargo
-  #       with:
-  #         cmd: test
-  #         features: ${{ matrix.features }}
-  #         verbose: true
-  #         deny_warnings: true
+  functionality:
+    runs-on: ubuntu-latest
+    if: ${{ success() && needs.wip-check.outputs.is-wip != 'true' }}
+    needs: wip-check
+    strategy:
+      matrix:
+        rust_version: [ "stable", "beta" ]
+        features: [ "", "default", "*" ]
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust_version }}
+      - name: Check build
+        uses: ./.github/actions/run-cargo
+        with:
+          cmd: build
+          features: ${{ matrix.features }}
+          verbose: true
+          deny_warnings: true
+      - name: Run tests
+        uses: ./.github/actions/run-cargo
+        with:
+          cmd: test
+          features: ${{ matrix.features }}
+          verbose: true
+          deny_warnings: true
 
   # signatures:
   #   runs-on: ubuntu-latest
