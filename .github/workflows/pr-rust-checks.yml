@@ -3,7 +3,6 @@ on:
   pull_request:
     type: [opened, reopened, synchronize]
 
-
 jobs:
   style:
     runs-on: ubuntu-latest
@@ -16,12 +15,29 @@ jobs:
 
   functionality:
     runs-on: ubuntu-latest
+    strategy:
+      rust_version: [ "stable", "beta" ]
+      features: [ "", "default", "*" ]
     steps:
       - uses: actions/checkout@v1
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust_version }}
+
       - name: Check build
-        run: cargo build --verbose
-        # If not WIP: prefix then cargo build --verbose ??option to inject deny(warning)??
+        uses: .github/actions/run-cargo
+        with:
+          cmd: build
+          features: ${{ matrix.features }}
+          verbose: true
+          deny_warnings: true
+
       - name: Run tests
-        run: cargo test --verbose
-        # cargo test --no-default-features --verbose
-        # cargo test --all-features --verbose
+        uses: .github/actions/run-cargo
+        with:
+          cmd: test
+          features: ${{ matrix.features }}
+          verbose: true
+          deny_warnings: true

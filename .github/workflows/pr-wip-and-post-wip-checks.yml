@@ -19,7 +19,9 @@ jobs:
             if (issue.title.startsWith("WIP")) {
                 throw Error("Can not merge WIP pull requests.")
             }
+
       - uses: actions/checkout@v1
+
       - uses: ./.github/actions/verify-signatures
         with:
           require_signed_commits: false

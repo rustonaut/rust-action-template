@@ -1,0 +1,67 @@
+name: 'Runs Cargo'
+description: 'Runs cargo, assuming it's available in the path.'
+inputs:
+  cmd:
+    description: 'The subcommand to run (build/test)'
+    required: true
+  features:
+    description: |
+      The features to enable.
+      Set it to '' to disable all features.
+      Set it e.g. to 'default,feat1' to enable default features and feat1.
+      Set it to '*' to enabled all features.
+    required: false
+    default: default
+  deny_warnings:
+    description: "Adds a special flag to cargo calls which act's like a top-level #[deny(warnings)]."
+    required: false
+    default: false
+  all:
+    description: "Adds the --all flag"
+    default: false
+    required: false
+  release:
+    description: "Adds the --release flag"
+    default: false
+    required: false
+  verbose:
+    description: "Adds the --verbose flag"
+    default: true
+    required: false
+runs:
+    using: "composite"
+    steps:
+        - shell: bash
+          run: |
+            declare -a params
+            params+=("$INPUT_CMD")
+
+            if [ "$INPUT_DENY_WARNINGS" = "true" ] ; then
+              params+=("-D" "warnings")
+            fi
+
+            case "$INPUT_FEATURES" in
+              "*")
+                params+=("--all-features")
+                ;;
+              "default")
+                # --features "default" can cause problems if there are no default enabled features.
+                ;;
+              *) #default case not "*"
+                params+=("--no-default-features" "--features" "$INPUT_FEATURES")
+                ;;
+            esac
+
+            if [ "$INPUT_ALL" = "true" ] ; then
+              params+=("--all")
+            fi
+
+            if [ "$INPUT_RELEASE" = "true" ] ; then
+              params+=("--release")
+            fi
+
+            if [ "$INPUT_VERBOSE" = "true" ] ; then
+              params+=("--verbose")
+            fi
+
+            cargo "${params[@]}"
