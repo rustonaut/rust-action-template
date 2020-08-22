@@ -3,7 +3,7 @@ name: Automatically Publish to crates.io
 on:
   push:
     branches:
-      - master
+      - nightly
 
 
 jobs:
@@ -22,6 +22,9 @@ jobs:
       #   with:
       #     require_tag_signing_fpr: ${{ secrets.TagSigningFpr }}
       #     publishing_key: ${{ secrets.CARGO_PUBLISHING_KEY }}
+      # TODO implement (BETTER IDEA):
+      #   change the verify action to output map of (verified) tags
+      #   then use that as input for a publish action.
       - uses: actions/checkout@v1
       - name: Test things out
         run: |
