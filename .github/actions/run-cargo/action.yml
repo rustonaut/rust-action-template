@@ -35,13 +35,13 @@ runs:
           run: |
             set -euo pipefail
             declare -a params
-            params+=("$INPUT_CMD")
+            params+=("${{ inputs.cmd }}")
 
-            if [ "$INPUT_DENY_WARNINGS" = "true" ] ; then
+            if [ "${{ inputs.deny_warnings }}" = "true" ] ; then
               params+=("-D" "warnings")
             fi
 
-            case "$INPUT_FEATURES" in
+            case "${{ inputs.features }}" in
               "*")
                 params+=("--all-features")
                 ;;
@@ -49,19 +49,19 @@ runs:
                 # --features "default" can cause problems if there are no default enabled features.
                 ;;
               *) #default case not "*"
-                params+=("--no-default-features" "--features" "$INPUT_FEATURES")
+                params+=("--no-default-features" "--features" "${{ inputs.features }}")
                 ;;
             esac
 
-            if [ "$INPUT_ALL" = "true" ] ; then
+            if [ "${{ inputs.all }}" = "true" ] ; then
               params+=("--all")
             fi
 
-            if [ "$INPUT_RELEASE" = "true" ] ; then
+            if [ "${{ inputs.release }}" = "true" ] ; then
               params+=("--release")
             fi
 
-            if [ "$INPUT_VERBOSE" = "true" ] ; then
+            if [ "${{ inputs.verbose }}" = "true" ] ; then
               params+=("--verbose")
             fi
 
